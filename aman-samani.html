@@ -183,13 +183,73 @@ URL:https://dhanwalle.com
 ADR:;;PANCHSHEEL PARK NEW DELHI;DELHI;Delhi;110017;India
 END:VCARD`;
             
+            // Create VCF file and trigger direct save
             const blob = new Blob([vcard], { type: 'text/vcard' });
             const url = window.URL.createObjectURL(blob);
+            
+            // For mobile: try direct contact save first
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([vcard], 'aman_samani.vcf', { type: 'text/vcard' })] })) {
+                const file = new File([vcard], 'aman_samani.vcf', { type: 'text/vcard' });
+                navigator.share({
+                    title: 'Aman Samani Contact',
+                    text: 'Save contact information',
+                    files: [file]
+                }).catch(() => {
+                    // Fallback to download if share fails
+                    downloadVCard(url);
+                });
+            } else {
+                // Direct download for desktop/fallback
+                downloadVCard(url);
+            }
+        }
+        
+        function downloadVCard(url) {
             const a = document.createElement('a');
             a.href = url;
             a.download = 'aman_samani.vcf';
+            a.style.display = 'none';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            
+            // Show success message
+            showContactSavedMessage();
+        }
+        
+        function showContactSavedMessage() {
+            const message = document.createElement('div');
+            message.innerHTML = 'Contact saved successfully!';
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #28a745;
+                color: white;
+                padding: 15px 30px;
+                border-radius: 10px;
+                font-weight: bold;
+                z-index: 1000;
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                    50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(message);
+            setTimeout(() => {
+                document.body.removeChild(message);
+            }, 2000);
         }
     </script>
 </body>
