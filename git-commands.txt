@@ -1,0 +1,16 @@
+# Git Commands for Upload
+
+# Step 1: Clone repository (agar nahi kiya hai)
+git clone https://github.com/fintechlmsfrontnew/employee-cards.git
+cd employee-cards
+
+# Step 2: Sab files copy karo current folder se repo folder mein
+# (Manual copy karo)
+
+# Step 3: Git commands
+git add .
+git commit -m "Initial commit - Employee cards system"
+git push origin main
+
+# Step 4: Status check karo
+git status
