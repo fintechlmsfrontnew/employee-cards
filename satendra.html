@@ -111,7 +111,7 @@
 <body>
     <div class="container">
         <div class="employee-card">
-            <img src="https://via.placeholder.com/120x120/667eea/ffffff?text=AS" alt="Profile" class="profile-img">
+            <img src="satendra-pic.jpg" alt="Profile" class="profile-img">
             
             <h1 class="employee-name">Satendra Upadhyay</h1>
             <p class="employee-designation">Founder</p>
@@ -124,7 +124,7 @@
                 <a href="mailto:satendralibra@gmail.com" class="contact-icon">
                     <i class="fas fa-envelope"></i>
                 </a>
-                <a href="https://www.google.com/maps?q=28.5826962,77.3151284&z=17&hl=en" class="contact-icon">
+                <a href="https://maps.app.goo.gl/Wk2ikRuifGNoDMdD8" class="contact-icon">
                     <i class="fas fa-map-marker-alt"></i>
                 </a>
             </div>
@@ -158,7 +158,7 @@
                     <i class="fas fa-map-marker-alt"></i>
                     <div>
                         <strong>Location:</strong>
-                        <a href="https://www.google.com/maps?q=28.5826962,77.3151284&z=17&hl=en" target="_blank">View on Google Maps</a>
+                        <a href="https://maps.app.goo.gl/Wk2ikRuifGNoDMdD8" target="_blank">D-6, Sector 2, Noida Uttar Pradesh, 201301 (Near- Priyagold)</a>
                     </div>
                 </div>
             </div>
@@ -187,77 +187,30 @@ END:VCARD`;
             const blob = new Blob([vcard], { type: 'text/vcard' });
             const url = window.URL.createObjectURL(blob);
             
-            // Try direct contact import first
+            // Try to open contact app directly (mobile)
             if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                // Mobile: Try to open contact app directly
-                const contactData = `BEGIN:VCARD
-VERSION:3.0
-FN:Satendra Upadhyay
-ORG:Fintech Smart Solutions
-TITLE:Founder
-TEL:+919899886088
-EMAIL:satendralibra@gmail.com
-URL:https://fintechsmartsolutions.com/
-ADR:;;28.5826962,77.3151284;New Delhi;Delhi;110017;India
-END:VCARD`;
-                
-                // Create data URL for direct import
-                const dataUrl = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(contactData);
-                
-                // Try to open in contacts app
+                // Mobile: Direct contact import
+                const dataUrl = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
                 window.location.href = dataUrl;
-                
-                // Show success message
-                setTimeout(() => {
-                    showContactSavedMessage();
-                }, 1000);
-                
-            } else {
-                // Desktop: Try to use native contact import
-                try {
-                    const vcfData = vcard.replace(/BEGIN:VCARD[\s\S]*END:VCARD/g, (match) => {
-                        return match.trim();
-                    });
-                    
-                    // Create and trigger VCF file
-                    const blob = new Blob([vcard], { type: 'text/vcard' });
-                    const file = new File([blob], 'aman_samani.vcf', { type: 'text/vcard' });
-                    
-                    // Try to use Web Share API for contact
-                    if (navigator.share && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            title: 'Aman Samani Contact',
-                            text: 'Save contact to your contacts',
-                            files: [file]
-                        }).then(() => {
-                            showContactSavedMessage();
-                        }).catch(() => {
-                            // Fallback to automatic import
-                            tryDirectImport(vcard);
-                        });
-                    } else {
-                        // Fallback to direct import
-                        tryDirectImport(vcard);
-                    }
-                } catch (error) {
-                    // Final fallback to download
-                    downloadVCard(url);
-                }
-            }
-        }
-        
-        function tryDirectImport(vcard) {
-            try {
-                // Create a temporary link for direct contact import
-                const tempLink = document.createElement('a');
-                tempLink.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
-                tempLink.target = '_blank';
-                tempLink.click();
-                
                 showContactSavedMessage();
-            } catch (error) {
-                // If direct import fails, fallback to download
-                downloadVCard(window.URL.createObjectURL(new Blob([vcard], { type: 'text/vcard' })));
+            } else {
+                // Desktop: Try to open in new tab first
+                const dataUrl = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
+                const newWindow = window.open(dataUrl, '_blank');
+                if (newWindow) {
+                    showContactSavedMessage();
+                } else {
+                    // Fallback: Force download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'satendra_upadhyay.vcf';
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    showContactSavedMessage();
+                }
             }
         }
         
